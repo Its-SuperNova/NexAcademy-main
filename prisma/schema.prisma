@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Valid roles for users:
+/// - STUDENT: Default role for new users
+/// - MANAGER: Can manage courses and users
+/// - ADMIN: Full system access
+/// - INSTRUCTOR: Can create and edit courses
+/// - NON_EDITING_INSTRUCTOR: Can view courses but not edit them
+enum Role {
+  STUDENT
+  MANAGER
+  ADMIN
+  INSTRUCTOR
+  NON_EDITING_INSTRUCTOR
+}
+
+enum Visibility {
+  SHOW
+  HIDE
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  /// @enum {STUDENT|MANAGER|ADMIN|INSTRUCTOR|NON_EDITING_INSTRUCTOR}
+  /// - STUDENT: Default role for new users
+  /// - MANAGER: Can manage courses and users
+  /// - ADMIN: Full system access
+  /// - INSTRUCTOR: Can create and edit courses
+  /// - NON_EDITING_INSTRUCTOR: Can view courses but not edit them
+  role          Role      @default(STUDENT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  resetToken    String?   @unique
+  resetTokenExp DateTime?
+
+  @@index([role])
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  description String?    @default("")
+  visibility  Visibility @default(SHOW)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  courses     Course[]
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  isVisible   Boolean  @default(true)
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId])
+}
