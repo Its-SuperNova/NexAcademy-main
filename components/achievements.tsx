@@ -33,7 +33,7 @@ export function Achievements({ achievements }: AchievementsProps) {
                 <h3 className="font-medium">{achievement.title}</h3>
                 <p className="text-sm text-muted-foreground">{achievement.description}</p>
               </div>
-              <div className="flex h-8 items-center rounded-full bg-primary/10 px-3 text-xs font-medium text-primary">
+              <div className="flex h-8 w-[43px] items-center rounded-full bg-primary/10 px-3 text-xs font-medium text-primary">
                 {achievement.progress}%
               </div>
             </div>
